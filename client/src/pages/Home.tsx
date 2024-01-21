@@ -3,28 +3,57 @@ import TaskComponent from '@/components/TaskComponent'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
-import { taskData } from '../../dummy-data'
+import { useEffect, useState } from 'react'
+import { createTask } from '@/lib/createTask'
+import { useTaskStore } from '@/store/taskStore'
 
 type Props = {}
 
 type Task ={
-id:number,
-title:string,
+_id?:string,
+name:string,
 completed:boolean
 }
 
 export default function Home({}: Props) {
 
-    const [tasks, setTasks] = useState(taskData)
+    // const [tasks, setTasks] = useState([])
     const [inputValue, setInputValue] = useState('')
+    const {fetchTasks, tasks} = useTaskStore()
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+    useEffect(  () => {
+        // const fetchData = async () => {
+
+        //   try {
+        //     const res = await axios.get('http://localhost:3000/api/tasks')
+        //     if(!res) return console.log('Axios Error')
+        //     const taskData = res.data
+        //     setTasks(taskData.tasks)
+            
+        //   } catch (error) {
+        //     console.error(error)
+        //   }
+        // }
+
+
+        // fetchData()
+        fetchTasks()
+
+    }, [])
+
+      console.log(tasks)
+  
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      // const newTaskId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1; // Generate a unique ID
+      // setTasks([...tasks, {id:newTaskId, title: inputValue, completed: false}])
+
         e.preventDefault()
 
-        const newTaskId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1; // Generate a unique ID
-        
-        setTasks([...tasks, {id:newTaskId, title: inputValue, completed: false}])
+        const newTask = {name:inputValue, completed:false}
+        const res = await createTask(newTask)
+        console.log(res)
+        fetchTasks()
         setInputValue('')
 
         
@@ -59,7 +88,7 @@ export default function Home({}: Props) {
 
       <div className='flex flex-col gap-5'>
         {tasks.map((task: Task) => (
-            <TaskComponent title={task.title} completed={task.completed} key={task.id} id={task.id}/>
+            <TaskComponent name={task.name} completed={task.completed} key={task._id} id={task._id!}/>
         ))}
       </div>
 
