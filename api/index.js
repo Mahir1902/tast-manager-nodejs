@@ -2,17 +2,15 @@ const express = require('express')
 const tasks = require('./routes/tasks')
 const connectDB = require('./db/connect')
 require('dotenv').config();
+const cors = require('cors')
 
 const app = express()
 
 
 //middleware 
 app.use(express.json()) // wont have data in req.body without this. Remember app.use allows the middleware to be used in all the routes
-
+app.use(cors())
 // routes
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
 
 
 
@@ -28,7 +26,7 @@ const port = 3000
 
 const start = async () => {
     try {
-        await connectDB(process.env.MONGO_URI)
+        await connectDB(process.env.MONGO_CONNECTION_STRING)
         app.listen(port , () => {console.log( `Server is listening on port ${port}!`)})
     }
     catch (err) {
